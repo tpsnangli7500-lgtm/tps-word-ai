@@ -1,0 +1,786 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="color-scheme" content="light" />
+<link rel="icon" href="data:," />
+<title>TPS 3-Options</title>
+<script src="https://appsforoffice.microsoft.com/lib/1/hosted/office.js"></script>
+<style>
+  :root{
+    --teal-dark:#05382f;
+    --teal:#0d9488;
+    --teal-dark-btn:#0f766e;
+    --teal-soft:#e6f4f1;
+    --ink:#12211d;
+    --muted:#5b6f6a;
+    --line:#d8e4e0;
+    --card:#ffffff;
+    --bg:#f4f8f7;
+    --ok:#15803d;
+    --ok-bg:#eaf7ee;
+    --err:#b91c1c;
+    --err-bg:#fdeeee;
+    --gold:#c9a227;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{
+    font-family:"Segoe UI",SegoeUI,system-ui,-apple-system,Arial,sans-serif;
+    background:var(--bg);
+    color:var(--ink);
+    font-size:14px;
+    line-height:1.5;
+    min-width:280px;
+  }
+  button,select,input,textarea{font-family:inherit;font-size:14px}
+  button,[role="button"],select,input:not([type="checkbox"]){min-height:40px}
+
+  /* ---------- Header ---------- */
+  header{
+    background:var(--teal-dark);
+    color:#fff;
+    padding:14px 16px 12px;
+  }
+  header .title{
+    font-size:19px;font-weight:700;letter-spacing:.2px;margin:0;
+    display:flex;align-items:center;gap:9px;
+  }
+  header .title .badge{
+    background:var(--teal);color:#fff;font-size:11px;font-weight:700;
+    padding:3px 8px;border-radius:999px;letter-spacing:.4px;white-space:nowrap;
+  }
+  header .sub{margin:4px 0 0;font-size:12.5px;color:#bfe3da}
+  header .flow{
+    margin:10px 0 2px;display:flex;flex-wrap:wrap;gap:6px;align-items:center;
+    font-size:11.5px;color:#d7efe9;
+  }
+  header .flow .step{
+    background:rgba(255,255,255,.10);border:1px solid rgba(255,255,255,.22);
+    padding:3px 8px;border-radius:999px;white-space:nowrap;
+  }
+  header .flow .arr{color:#7fc9bb}
+
+  main{padding:12px 14px 22px;max-width:640px;margin:0 auto}
+
+  /* ---------- Environment banner ---------- */
+  .env-banner{
+    display:none;border:1px solid #ead9a0;background:#fdf6dd;color:#6b5410;
+    border-radius:8px;padding:9px 11px;font-size:12.5px;margin-bottom:12px;
+  }
+  .env-banner.show{display:block}
+  .env-banner b{color:#54400a}
+
+  /* ---------- Settings ---------- */
+  details.settings{
+    background:var(--card);border:1px solid var(--line);border-radius:10px;
+    margin-bottom:12px;overflow:hidden;
+  }
+  details.settings summary{
+    cursor:pointer;padding:11px 13px;font-weight:600;font-size:13.5px;
+    display:flex;align-items:center;gap:8px;list-style:none;min-height:44px;
+  }
+  details.settings summary::-webkit-details-marker{display:none}
+  details.settings summary .gear{color:var(--teal);font-size:16px;line-height:1}
+  details.settings summary .chev{margin-left:auto;color:var(--muted);transition:transform .15s}
+  details.settings[open ] summary .chev{transform:rotate(180deg)}
+  details.settings summary .saved-dot{
+    font-size:11px;font-weight:600;color:var(--ok);background:var(--ok-bg);
+    border-radius:999px;padding:2px 8px;display:none;
+  }
+  details.settings summary .saved-dot.show{display:inline-block}
+  .settings-body{padding:2px 13px 14px;border-top:1px solid var(--line)}
+  .field{margin-top:11px}
+  .field label{display:block;font-size:12px;font-weight:600;color:var(--muted);margin-bottom:5px;letter-spacing:.2px}
+  .field select,.field input[type="password"],.field input[type="text"]{
+    width:100%;padding:8px 10px;border:1px solid var(--line);border-radius:8px;
+    background:#fff;color:var(--ink);
+  }
+  .field select:focus,.field input:focus{outline:2px solid var(--teal);outline-offset:0;border-color:var(--teal)}
+  .key-row{display:flex;gap:7px}
+  .key-row input{flex:1;min-width:0}
+  .key-row button{
+    flex:0 0 auto;padding:0 12px;border:1px solid var(--line);background:#fff;
+    border-radius:8px;cursor:pointer;font-weight:600;color:var(--teal-dark-btn);
+  }
+  .settings-note{font-size:11.5px;color:var(--muted);margin:10px 0 0}
+  .settings-note a{color:var(--teal-dark-btn)}
+
+  /* ---------- Sections ---------- */
+  .card{
+    background:var(--card);border:1px solid var(--line);border-radius:10px;
+    padding:13px;margin-bottom:12px;
+  }
+  .card h2{font-size:13px;margin:0 0 4px;letter-spacing:.3px;color:var(--teal-dark);text-transform:uppercase}
+  .card .hint{font-size:12.5px;color:var(--muted);margin:0 0 10px}
+
+  .btn{
+    border:0;border-radius:8px;cursor:pointer;font-weight:600;
+    padding:9px 14px;display:inline-flex;align-items:center;justify-content:center;gap:7px;
+    transition:background .12s, transform .05s;
+  }
+  .btn:active{transform:translateY(1px)}
+  .btn:disabled{opacity:.55;cursor:not-allowed}
+  .btn-primary{background:var(--teal);color:#fff;width:100%;font-size:15.5px;padding:13px 14px;min-height:48px}
+  .btn-primary:hover:not(:disabled){background:var(--teal-dark-btn)}
+  .btn-outline{background:#fff;color:var(--teal-dark-btn);border:1.5px solid var(--teal);width:100%}
+  .btn-outline:hover:not(:disabled){background:var(--teal-soft)}
+  .btn-small{padding:7px 12px;font-size:13px;min-height:38px}
+  .btn-replace{background:var(--teal);color:#fff;flex:1}
+  .btn-replace:hover:not(:disabled){background:var(--teal-dark-btn)}
+  .btn-copy{background:#fff;color:var(--teal-dark-btn);border:1.5px solid var(--teal)}
+  .btn-copy:hover{background:var(--teal-soft)}
+
+  #selPreview{
+    width:100%;min-height:86px;resize:vertical;
+    border:1px solid var(--line);border-radius:8px;padding:9px 10px;
+    background:#fbfdfd;color:var(--ink);line-height:1.55;
+  }
+  #selPreview:focus{outline:2px solid var(--teal);border-color:var(--teal)}
+  .sel-meta{display:flex;justify-content:space-between;gap:8px;font-size:11.5px;color:var(--muted);margin-top:6px;flex-wrap:wrap}
+  .sel-meta .src{font-weight:600}
+
+  /* ---------- Status ---------- */
+  .status{
+    display:none;border-radius:8px;padding:9px 11px;font-size:13px;margin:0 0 12px;
+    word-break:break-word;
+  }
+  .status.show{display:block}
+  .status.ok{background:var(--ok-bg);color:var(--ok);border:1px solid #bfe6cb}
+  .status.err{background:var(--err-bg);color:var(--err);border:1px solid #f3c2c2}
+  .status.busy{background:var(--teal-soft);color:var(--teal-dark);border:1px solid #bfe0d9}
+  .spinner{
+    display:inline-block;width:13px;height:13px;border:2px solid #9fd4ca;border-top-color:var(--teal-dark);
+    border-radius:50%;vertical-align:-2px;margin-right:7px;animation:spin .7s linear infinite;
+  }
+  @keyframes spin{to{transform:rotate(360deg)}}
+  @media (prefers-reduced-motion: reduce){.spinner{animation:none}}
+
+  /* ---------- Option cards ---------- */
+  #optionsWrap{display:none}
+  #optionsWrap.show{display:block}
+  .opt-card{
+    background:var(--card);border:1px solid var(--line);border-left:4px solid var(--teal);
+    border-radius:10px;padding:13px;margin-bottom:11px;
+  }
+  .opt-card.t2{border-left-color:#2563eb}
+  .opt-card.t3{border-left-color:var(--gold)}
+  .opt-tag{
+    display:inline-block;font-size:11px;font-weight:700;letter-spacing:.6px;
+    padding:3px 9px;border-radius:999px;margin-bottom:8px;
+  }
+  .opt-card.t1 .opt-tag{background:var(--teal-soft);color:var(--teal-dark)}
+  .opt-card.t2 .opt-tag{background:#e8effc;color:#1d4ed8}
+  .opt-card.t3 .opt-tag{background:#faf3d7;color:#7a5d05}
+  .opt-text{font-size:14.5px;line-height:1.65;white-space:pre-wrap;word-break:break-word;margin:0 0 12px}
+  .opt-actions{display:flex;gap:8px}
+  .opt-actions .btn{flex:1}
+  .opt-actions .btn-copy{flex:0 0 96px}
+
+  footer{padding:0 14px 18px;max-width:640px;margin:0 auto}
+  footer p{font-size:11.5px;color:var(--muted);margin:0;line-height:1.6}
+</style>
+</head>
+<body>
+
+<header>
+  <p class="title">TPS 3-Options <span class="badge">1-CLICK REPLACE</span></p>
+  <p class="sub">Sentence select karo — Rewrite, Synonyms aur Humanizer, teeno options ek saath.</p>
+  <div class="flow">
+    <span class="step">1 · Word me text select karo</span><span class="arr">→</span>
+    <span class="step">2 · Selection Load Karo</span><span class="arr">→</span>
+    <span class="step">3 · 3 Options Banao</span><span class="arr">→</span>
+    <span class="step">4 · Replace dabao</span>
+  </div>
+</header>
+
+<main>
+  <div class="env-banner" id="envBanner">
+    <b>Word ke bahar khula hai.</b> Ye page Word task-pane ke liye bana hai. Yahan tum text neeche wale box me paste karke 3 options test kar sakte ho — lekin <b>Replace</b> button sirf Word ke andar kaam karega, wahan selected text 1 click me badal jayega.
+  </div>
+
+  <!-- ============ SETTINGS ============ -->
+  <details class="settings" id="settingsBox">
+    <summary>
+      <span class="gear" aria-hidden="true">⚙</span> Settings — Provider, Model, API Key
+      <span class="saved-dot" id="savedDot">Saved ✓</span>
+      <span class="chev" aria-hidden="true">▾</span>
+    </summary>
+    <div class="settings-body">
+      <div class="field">
+        <label for="providerSel">Provider</label>
+        <select id="providerSel">
+          <option value="gemini">Gemini (Google)</option>
+          <option value="groq">Groq</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="modelSel">Model</label>
+        <select id="modelSel"></select>
+      </div>
+      <div class="field">
+        <label for="apiKeyInput">API Key</label>
+        <div class="key-row">
+          <input type="password" id="apiKeyInput" placeholder="Apni API key yahan paste karo" autocomplete="off" spellcheck="false" />
+          <button type="button" id="keyToggle" aria-label="Key dikhao ya chhupao">Dikhao</button>
+        </div>
+      </div>
+      <p class="settings-note">Key sirf is browser/pane me save hoti hai (har provider ki alag). Gemini key: <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener">aistudio.google.com/apikey</a> · Groq key: <a href="https://console.groq.com/keys" target="_blank" rel="noopener">console.groq.com/keys</a></p>
+    </div>
+  </details>
+
+  <!-- ============ SELECTION ============ -->
+  <section class="card" aria-labelledby="selHead">
+    <h2 id="selHead">Step 1 — Selected Text</h2>
+    <p class="hint">Pehle Word document me jitna sentence ya paragraph badalna hai, use select karo. Phir ye button dabao:</p>
+    <button type="button" class="btn btn-outline" id="loadBtn">📥 Selection Load Karo</button>
+    <div class="field" style="margin-top:11px">
+      <label for="selPreview">Selected text (yahan dikhega — chaho to haath se bhi badal sakte ho)</label>
+      <textarea id="selPreview" placeholder="Selected text yahan aayega… Word ke bahar ho to yahan paste karke test kar sakte ho."></textarea>
+    </div>
+    <div class="sel-meta">
+      <span class="src" id="selSource">Source: —</span>
+      <span id="selCount">0 characters</span>
+    </div>
+  </section>
+
+  <!-- ============ GENERATE ============ -->
+  <div class="status" id="statusBox" role="status" aria-live="polite"></div>
+
+  <button type="button" class="btn btn-primary" id="genBtn">✨ 3 Options Banao</button>
+  <p style="font-size:12px;color:var(--muted);margin:8px 2px 14px">Ek click me teeno versions banenge — <b>1 · Rewrite</b> (nayi structure), <b>2 · Synonyms</b> (shabd badle), <b>3 · Humanizer</b> (natural human flow). Citations [74, 75], numbers aur scientific terms waise ke waise rahenge.</p>
+
+  <!-- ============ OPTIONS ============ -->
+  <div id="optionsWrap" aria-live="polite"></div>
+</main>
+
+<footer>
+  <p>Replace dabate hi Word me wahi selected hissa us option se badal jayega — copy-paste ki zaroorat nahi. Galat option lag jaye to Word me Ctrl+Z se wapas aa jayega.</p>
+</footer>
+
+<script>
+(function(){
+  "use strict";
+
+  var LS_KEY = "tps3opt_settings_v1";
+
+  var MODELS = {
+    gemini: [
+      { id: "gemini-3-flash-preview", label: "gemini-3-flash-preview (default)" },
+      { id: "gemini-2.5-flash",       label: "gemini-2.5-flash" },
+      { id: "gemini-2.5-flash-lite",  label: "gemini-2.5-flash-lite (quota zyada)" },
+      { id: "gemini-2.0-flash",       label: "gemini-2.0-flash" }
+    ],
+    groq: [
+      { id: "llama-3.3-70b-versatile", label: "llama-3.3-70b-versatile (default)" },
+      { id: "llama-3.1-8b-instant",    label: "llama-3.1-8b-instant (fast)" },
+      { id: "openai/gpt-oss-120b",     label: "openai/gpt-oss-120b" },
+      { id: "qwen/qwen3-32b",          label: "qwen/qwen3-32b" }
+    ]
+  };
+  var DEFAULT_MODEL = { gemini: "gemini-3-flash-preview", groq: "llama-3.3-70b-versatile" };
+
+  var SYSTEM = "You are an expert academic editor. You rewrite text in natural, human-sounding English. You never change the meaning, facts, numbers, units or citations.";
+
+  function buildPrompt(text){
+    return [
+      "Task: Give EXACTLY 3 alternative versions of the text below.",
+      "Output ONLY the 3 marked sections in the exact format shown — no introduction, no explanation, nothing before <<<OPTION1>>> or after the third version.",
+      "",
+      "<<<OPTION1>>>",
+      "(rewrite — same meaning, completely fresh sentence structure)",
+      "<<<OPTION2>>>",
+      "(synonyms — same structure, important words replaced with natural synonyms)",
+      "<<<OPTION3>>>",
+      "(humanizer — natural human-written flow, simple and clear, academic tone kept)",
+      "",
+      "Rules:",
+      "- Keep citations like [74, 75], all numbers, units and scientific terms exactly unchanged.",
+      "- Do not add any new information. Do not drop any information.",
+      "- Each version must be complete and ready to paste in place of the original.",
+      "",
+      "Text:",
+      text
+    ].join("\n");
+  }
+
+  /* ---------------- State / settings ---------------- */
+  var settings = {
+    provider: "gemini",
+    models: { gemini: DEFAULT_MODEL.gemini, groq: DEFAULT_MODEL.groq },
+    keys:   { gemini: "", groq: "" }
+  };
+
+  function loadSettings(){
+    try {
+      var raw = localStorage.getItem(LS_KEY);
+      if (!raw) return;
+      var s = JSON.parse(raw);
+      if (s && typeof s === "object") {
+        if (s.provider === "gemini" || s.provider === "groq") settings.provider = s.provider;
+        if (s.models) {
+          if (s.models.gemini) settings.models.gemini = s.models.gemini;
+          if (s.models.groq) settings.models.groq = s.models.groq;
+        }
+        if (s.keys) {
+          if (typeof s.keys.gemini === "string") settings.keys.gemini = s.keys.gemini;
+          if (typeof s.keys.groq === "string") settings.keys.groq = s.keys.groq;
+        }
+      }
+    } catch (e) { /* storage unavailable — in-memory only */ }
+  }
+
+  var savedTimer = null;
+  function saveSettings(showDot){
+    try { localStorage.setItem(LS_KEY, JSON.stringify(settings)); } catch (e) {}
+    if (showDot) {
+      var dot = document.getElementById("savedDot");
+      dot.classList.add("show");
+      if (savedTimer) clearTimeout(savedTimer);
+      savedTimer = setTimeout(function(){ dot.classList.remove("show"); }, 1600);
+    }
+  }
+
+  /* ---------------- DOM refs ---------------- */
+  var providerSel = document.getElementById("providerSel");
+  var modelSel    = document.getElementById("modelSel");
+  var apiKeyInput = document.getElementById("apiKeyInput");
+  var keyToggle   = document.getElementById("keyToggle");
+  var loadBtn     = document.getElementById("loadBtn");
+  var genBtn      = document.getElementById("genBtn");
+  var selPreview  = document.getElementById("selPreview");
+  var selSource   = document.getElementById("selSource");
+  var selCount    = document.getElementById("selCount");
+  var statusBox   = document.getElementById("statusBox");
+  var optionsWrap = document.getElementById("optionsWrap");
+  var envBanner   = document.getElementById("envBanner");
+
+  function refreshModelList(){
+    var list = MODELS[settings.provider] || [];
+    modelSel.innerHTML = "";
+    list.forEach(function(m){
+      var opt = document.createElement("option");
+      opt.value = m.id; opt.textContent = m.label;
+      modelSel.appendChild(opt);
+    });
+    var wanted = settings.models[settings.provider] || DEFAULT_MODEL[settings.provider];
+    var exists = list.some(function(m){ return m.id === wanted; });
+    modelSel.value = exists ? wanted : DEFAULT_MODEL[settings.provider];
+    settings.models[settings.provider] = modelSel.value;
+  }
+
+  function refreshKeyField(){
+    apiKeyInput.value = settings.keys[settings.provider] || "";
+    apiKeyInput.placeholder = settings.provider === "gemini"
+      ? "Gemini API key paste karo (AIza…)"
+      : "Groq API key paste karo (gsk_…)";
+  }
+
+  function initSettingsUI(){
+    loadSettings();
+    providerSel.value = settings.provider;
+    refreshModelList();
+    refreshKeyField();
+    if (!settings.keys[settings.provider]) {
+      document.getElementById("settingsBox").open = true;
+    }
+  }
+
+  providerSel.addEventListener("change", function(){
+    settings.provider = providerSel.value;
+    refreshModelList();
+    refreshKeyField();
+    saveSettings(true);
+  });
+  modelSel.addEventListener("change", function(){
+    settings.models[settings.provider] = modelSel.value;
+    saveSettings(true);
+  });
+  apiKeyInput.addEventListener("input", function(){
+    settings.keys[settings.provider] = apiKeyInput.value.trim();
+    saveSettings(true);
+  });
+  keyToggle.addEventListener("click", function(){
+    var show = apiKeyInput.type === "password";
+    apiKeyInput.type = show ? "text" : "password";
+    keyToggle.textContent = show ? "Chhupao" : "Dikhao";
+  });
+
+  /* ---------------- Status ---------------- */
+  function setStatus(kind, msg){
+    statusBox.className = "status show " + kind;
+    statusBox.innerHTML = "";
+    if (kind === "busy") {
+      var sp = document.createElement("span"); sp.className = "spinner"; sp.setAttribute("aria-hidden","true");
+      statusBox.appendChild(sp);
+    }
+    statusBox.appendChild(document.createTextNode(msg));
+  }
+  function clearStatus(){ statusBox.className = "status"; statusBox.textContent = ""; }
+
+  /* ---------------- Selection preview ---------------- */
+  function updateCount(){
+    var n = selPreview.value.length;
+    selCount.textContent = n + (n === 1 ? " character" : " characters");
+  }
+  selPreview.addEventListener("input", function(){
+    updateCount();
+    if (selPreview.value.length) selSource.textContent = "Source: box (haath se badla hua)";
+  });
+
+  /* ---------------- Office integration ---------------- */
+  var inWord = false;
+  var officeReady = false;
+
+  function friendlyNoWord(action){
+    setStatus("err", "Ye kaam sirf Word ke andar hoga. Abhi page Word ke bahar khula hai — text box me paste karke 3 options test kar sakte ho, lekin " + action + " ke liye page ko Word task-pane me kholo.");
+  }
+
+  function readSelectionViaWordRun(){
+    return Word.run(function(context){
+      var range = context.document.getSelection();
+      range.load("text");
+      return context.sync().then(function(){ return range.text || ""; });
+    });
+  }
+
+  function readSelectionFallback(){
+    return new Promise(function(resolve, reject){
+      try {
+        Office.context.document.getSelectedDataAsync(Office.CoercionType.Text, function(asyncResult){
+          if (asyncResult.status === Office.AsyncResultStatus.Failed) {
+            reject(new Error(asyncResult.error && asyncResult.error.message ? asyncResult.error.message : "Selection padh nahi paya."));
+          } else {
+            resolve(asyncResult.value || "");
+          }
+        });
+      } catch (e) { reject(e); }
+    });
+  }
+
+  function loadSelection(){
+    if (!officeReady || !inWord) { friendlyNoWord("Selection Load"); return; }
+    setStatus("busy", "Word se selected text load ho raha hai…");
+    var p = (typeof Word !== "undefined" && Word && typeof Word.run === "function")
+      ? readSelectionViaWordRun().catch(function(){ return readSelectionFallback(); })
+      : readSelectionFallback();
+    p.then(function(text){
+      text = (text || "").replace(/\s+$/,"");
+      if (!text.trim()) {
+        selPreview.value = "";
+        updateCount();
+        selSource.textContent = "Source: —";
+        setStatus("err", "Koi text selected nahi mila. Pehle Word document me sentence/paragraph select karo, phir Selection Load Karo dabao.");
+        return;
+      }
+      selPreview.value = text;
+      updateCount();
+      selSource.textContent = "Source: Word selection ✓";
+      setStatus("ok", "Selection load ho gaya (" + text.length + " characters). Ab “3 Options Banao” dabao.");
+    }).catch(function(err){
+      setStatus("err", "Selection load nahi hua: " + (err && err.message ? err.message : err));
+    });
+  }
+
+  function replaceSelectionWith(newText){
+    if (!officeReady || !inWord) { friendlyNoWord("Replace"); return Promise.reject(new Error("not-in-word")); }
+    if (typeof Word !== "undefined" && Word && typeof Word.run === "function") {
+      return Word.run(function(context){
+        var range = context.document.getSelection();
+        range.insertText(newText, Word.InsertLocation.replace);
+        return context.sync();
+      }).catch(function(){
+        return replaceSelectionFallback(newText);
+      });
+    }
+    return replaceSelectionFallback(newText);
+  }
+
+  function replaceSelectionFallback(newText){
+    return new Promise(function(resolve, reject){
+      try {
+        Office.context.document.setSelectedDataAsync(newText, { coercionType: Office.CoercionType.Text }, function(asyncResult){
+          if (asyncResult.status === Office.AsyncResultStatus.Failed) {
+            reject(new Error(asyncResult.error && asyncResult.error.message ? asyncResult.error.message : "Replace nahi hua."));
+          } else { resolve(); }
+        });
+      } catch (e) { reject(e); }
+    });
+  }
+
+  /* ---------------- AI calls ---------------- */
+  function callGemini(model, apiKey, promptText){
+    var url = "https://generativelanguage.googleapis.com/v1beta/models/" + encodeURIComponent(model) + ":generateContent?key=" + encodeURIComponent(apiKey);
+    var body = {
+      contents: [{ parts: [{ text: SYSTEM + "\n\n" + promptText }] }],
+      generationConfig: { temperature: 0.7, maxOutputTokens: 2048 }
+    };
+    return fetch(url, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body)
+    }).then(function(res){
+      return res.json().catch(function(){ return null; }).then(function(data){
+        if (!res.ok) {
+          var msg = (data && data.error && data.error.message) ? data.error.message : ("Gemini error (HTTP " + res.status + ")");
+          throw new Error(msg);
+        }
+        var parts = data && data.candidates && data.candidates[0] && data.candidates[0].content && data.candidates[0].content.parts;
+        if (!parts || !parts.length) throw new Error("Gemini ne khaali jawab bheja. Dobara try karo — ya model badal kar dekho.");
+        return parts.map(function(p){ return p.text || ""; }).join("");
+      });
+    });
+  }
+
+  function callGroq(model, apiKey, promptText){
+    return fetch("https://api.groq.com/openai/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": "Bearer " + apiKey
+      },
+      body: JSON.stringify({
+        model: model,
+        temperature: 0.7,
+        messages: [
+          { role: "system", content: SYSTEM },
+          { role: "user", content: promptText }
+        ]
+      })
+    }).then(function(res){
+      return res.json().catch(function(){ return null; }).then(function(data){
+        if (!res.ok) {
+          var msg = (data && data.error && data.error.message) ? data.error.message : ("Groq error (HTTP " + res.status + ")");
+          throw new Error(msg);
+        }
+        var content = data && data.choices && data.choices[0] && data.choices[0].message && data.choices[0].message.content;
+        if (!content) throw new Error("Groq ne khaali jawab bheja. Dobara try karo.");
+        return content;
+      });
+    });
+  }
+
+  /* ---------------- Parsing ---------------- */
+  function cleanChunk(s){
+    return (s || "")
+      .replace(/^\s*\((?:rewrite|synonyms|humanizer)[^)]*\)\s*/i, "")
+      .replace(/^\s*(?:\*\*)?(?:rewrite|synonyms|humanizer)(?:\*\*)?\s*[:\-—]\s*/i, "")
+      .trim();
+  }
+
+  function parseOptions(raw){
+    var text = (raw || "").replace(/\r\n/g, "\n");
+    var re = /<<<OPTION([123])>>>/g;
+    var marks = [];
+    var m;
+    while ((m = re.exec(text)) !== null) marks.push({ n: parseInt(m[1],10), start: m.index, end: re.lastIndex });
+    if (marks.length >= 2) {
+      var byNum = {};
+      for (var i = 0; i < marks.length; i++) {
+        var from = marks[i].end;
+        var to = (i + 1 < marks.length) ? marks[i + 1].start : text.length;
+        byNum[marks[i].n] = cleanChunk(text.slice(from, to));
+      }
+      var out = [];
+      [1,2,3].forEach(function(n){ if (byNum[n]) out.push({ n: n, text: byNum[n] }); });
+      if (out.length) return out;
+    }
+    // Tolerant fallback: split on numbered / heading lines
+    var lines = text.split("\n");
+    var groups = [];
+    var current = null;
+    var headingRe = /^\s*(?:#{1,4}\s*)?(?:\*\*)?\s*(?:option\s*)?([123])\s*(?:[.)\:\-]|\b)/i;
+    lines.forEach(function(line){
+      var hm = line.match(headingRe);
+      if (hm && /(rewrite|synonym|human|option|^[\s#*]*[123]\s*[.)\:\-])/i.test(line)) {
+        if (current) groups.push(current);
+        current = { n: parseInt(hm[1],10), text: line.replace(headingRe, "").replace(/\*\*/g,"").trim() };
+      } else if (current) {
+        current.text += (current.text ? "\n" : "") + line;
+      }
+    });
+    if (current) groups.push(current);
+    groups = groups.filter(function(g){ return g.text && g.text.trim(); })
+                   .map(function(g){ return { n: g.n, text: cleanChunk(g.text) }; });
+    if (groups.length >= 2) return groups.slice(0,3);
+    // Last resort: whole reply as one card
+    var whole = text.trim();
+    return whole ? [{ n: 1, text: whole }] : [];
+  }
+
+  /* ---------------- Rendering options ---------------- */
+  var TAGS = {
+    1: { cls: "t1", label: "1 · REWRITE" },
+    2: { cls: "t2", label: "2 · SYNONYMS" },
+    3: { cls: "t3", label: "3 · HUMANIZER" }
+  };
+
+  function renderOptions(options){
+    optionsWrap.innerHTML = "";
+    if (!options.length) {
+      optionsWrap.classList.remove("show");
+      setStatus("err", "AI ke jawab se options nahi bane. Ek baar phir “3 Options Banao” dabao.");
+      return;
+    }
+    options.forEach(function(opt, idx){
+      var meta = TAGS[opt.n] || TAGS[(idx % 3) + 1];
+      var card = document.createElement("div");
+      card.className = "opt-card " + meta.cls;
+
+      var tag = document.createElement("span");
+      tag.className = "opt-tag";
+      tag.textContent = meta.label;
+      card.appendChild(tag);
+
+      var p = document.createElement("p");
+      p.className = "opt-text";
+      p.textContent = opt.text;
+      card.appendChild(p);
+
+      var actions = document.createElement("div");
+      actions.className = "opt-actions";
+
+      var replaceBtn = document.createElement("button");
+      replaceBtn.type = "button";
+      replaceBtn.className = "btn btn-small btn-replace";
+      replaceBtn.textContent = "↩ Replace — 1 Click";
+      replaceBtn.addEventListener("click", function(){
+        replaceBtn.disabled = true;
+        setStatus("busy", "Word me text badla ja raha hai…");
+        replaceSelectionWith(opt.text).then(function(){
+          setStatus("ok", "Ho gaya ✓ — Word me selected text “" + meta.label + "” wale option se badal gaya. Galti lage to Word me Ctrl+Z dabao.");
+        }).catch(function(err){
+          if (err && err.message === "not-in-word") return; // friendly message already shown
+          setStatus("err", "Replace nahi hua: " + (err && err.message ? err.message : err) + " — Word me text dobara select karke phir try karo.");
+        }).finally(function(){ replaceBtn.disabled = false; });
+      });
+
+      var copyBtn = document.createElement("button");
+      copyBtn.type = "button";
+      copyBtn.className = "btn btn-small btn-copy";
+      copyBtn.textContent = "Copy";
+      copyBtn.addEventListener("click", function(){
+        copyText(opt.text).then(function(){
+          copyBtn.textContent = "Copied ✓";
+          setTimeout(function(){ copyBtn.textContent = "Copy"; }, 1500);
+        }).catch(function(){
+          setStatus("err", "Copy nahi hua — option ka text haath se select karke copy karo.");
+        });
+      });
+
+      actions.appendChild(replaceBtn);
+      actions.appendChild(copyBtn);
+      card.appendChild(actions);
+      optionsWrap.appendChild(card);
+    });
+    optionsWrap.classList.add("show");
+    optionsWrap.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+
+  function copyText(t){
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      return navigator.clipboard.writeText(t);
+    }
+    return new Promise(function(resolve, reject){
+      var ta = document.createElement("textarea");
+      ta.value = t;
+      ta.style.position = "fixed"; ta.style.opacity = "0";
+      document.body.appendChild(ta);
+      ta.select();
+      try {
+        var ok = document.execCommand("copy");
+        document.body.removeChild(ta);
+        ok ? resolve() : reject(new Error("copy failed"));
+      } catch (e) { document.body.removeChild(ta); reject(e); }
+    });
+  }
+
+  /* ---------------- Generate flow ---------------- */
+  function generate(){
+    var text = selPreview.value.trim();
+    var provider = settings.provider;
+    var model = settings.models[provider];
+    var apiKey = (settings.keys[provider] || "").trim();
+
+    if (!apiKey) {
+      document.getElementById("settingsBox").open = true;
+      setStatus("err", "Pehle upar Settings me apni " + (provider === "gemini" ? "Gemini" : "Groq") + " API key daalo — bina key ke options nahi banenge.");
+      apiKeyInput.focus();
+      return;
+    }
+    if (!text) {
+      setStatus("err", "Pehle text chahiye: Word me sentence select karke “Selection Load Karo” dabao, ya text box me paste karo.");
+      selPreview.focus();
+      return;
+    }
+    if (text.length < 3) {
+      setStatus("err", "Text bahut chhota hai — poora sentence select karo.");
+      return;
+    }
+
+    genBtn.disabled = true;
+    loadBtn.disabled = true;
+    optionsWrap.classList.remove("show");
+    optionsWrap.innerHTML = "";
+    setStatus("busy", (provider === "gemini" ? "Gemini" : "Groq") + " (" + model + ") se 3 options ban rahe hain… thoda intezaar karo.");
+
+    var promptText = buildPrompt(text);
+    var call = provider === "gemini"
+      ? callGemini(model, apiKey, promptText)
+      : callGroq(model, apiKey, promptText);
+
+    call.then(function(raw){
+      var options = parseOptions(raw);
+      renderOptions(options);
+      if (options.length) {
+        setStatus("ok", options.length + " options taiyaar hain ✓ — jo pasand aaye, uska Replace dabao. Word me wahi selected text 1 click me badal jayega.");
+      }
+    }).catch(function(err){
+      var msg = (err && err.message) ? err.message : String(err);
+      if (/failed to fetch|networkerror|load failed/i.test(msg)) {
+        msg = "Network/API se jud nahi paya. Internet check karo, API key sahi hai ya nahi dekho, phir dobara try karo. (Asli error: " + msg + ")";
+      }
+      setStatus("err", "API error: " + msg);
+    }).finally(function(){
+      genBtn.disabled = false;
+      loadBtn.disabled = false;
+    });
+  }
+
+  loadBtn.addEventListener("click", loadSelection);
+  genBtn.addEventListener("click", generate);
+
+  /* ---------------- Boot ---------------- */
+  initSettingsUI();
+  updateCount();
+
+  function markNotInWord(){
+    inWord = false;
+    envBanner.classList.add("show");
+  }
+
+  if (typeof Office !== "undefined" && Office && typeof Office.onReady === "function") {
+    var readyTimer = setTimeout(function(){
+      if (!officeReady) markNotInWord();
+    }, 3500);
+    try {
+      Office.onReady(function(info){
+        clearTimeout(readyTimer);
+        officeReady = true;
+        if (info && info.host === Office.HostType.Word) {
+          inWord = true;
+          envBanner.classList.remove("show");
+          setStatus("ok", "Word se jud gaya ✓ — document me text select karke “Selection Load Karo” dabao.");
+        } else {
+          markNotInWord();
+        }
+      });
+    } catch (e) { clearTimeout(readyTimer); markNotInWord(); }
+  } else {
+    markNotInWord();
+  }
+})();
+</script>
+</body>
+</html>
